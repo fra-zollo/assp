@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Riunioni ASSP</title>
+    <title>Dashboard ASSP Condivisa</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -11,12 +11,33 @@
             color: #333; 
             margin: 0; 
             padding: 20px; 
+            box-sizing: border-box;
         }
         h1 { 
             text-align: center; 
             color: #2c3e50; 
+            margin-bottom: 15px;
+        }
+        .header-actions {
+            display: flex;
+            justify-content: center;
             margin-bottom: 30px;
         }
+        .download-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.2s, transform 0.1s;
+        }
+        .download-btn:hover { background-color: #732d91; }
+        .download-btn:active { transform: scale(0.98); }
+
         .dashboard { 
             display: flex; 
             gap: 20px; 
@@ -32,7 +53,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 15px;
-            max-height: 85vh;
+            box-sizing: border-box;
         }
         h2 { 
             font-size: 1.2rem; 
@@ -45,7 +66,6 @@
         .col-short h2 { border-color: #e74c3c; }
         .col-long h2 { border-color: #2ecc71; }
 
-        /* Area inserimento nuovi dati */
         .input-area {
             display: flex;
             flex-direction: column;
@@ -74,20 +94,15 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s;
         }
         button.add-btn:hover { background-color: #1a252f; }
 
-        /* Area delle schede scorrevole */
         .cards-container {
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            padding-right: 5px;
         }
         
-        /* Stile delle singole schede */
         .card { 
             background: #fff; 
             padding: 15px; 
@@ -101,28 +116,15 @@
         }
         .card-content {
             flex-grow: 1;
-            white-space: pre-wrap; /* Mantiene gli "a capo" */
+            white-space: pre-wrap; 
             font-size: 14px;
             line-height: 1.4;
         }
         
-        /* Stile specifico per le checklist */
-        .todo-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        .todo-item input[type="checkbox"] {
-            margin-top: 4px;
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-        .completed {
-            text-decoration: line-through;
-            color: #95a5a6;
-        }
+        .todo-item { display: flex; align-items: flex-start; gap: 10px; }
+        .todo-item input[type="checkbox"] { margin-top: 4px; transform: scale(1.2); cursor: pointer; }
+        .completed { text-decoration: line-through; color: #95a5a6; }
 
-        /* Pulsante elimina */
         button.delete-btn {
             background: none;
             border: none;
@@ -131,33 +133,32 @@
             font-size: 16px;
             padding: 0 5px;
             opacity: 0.5;
-            transition: opacity 0.2s;
         }
         .card:hover button.delete-btn { opacity: 1; }
 
-        .status { 
-            text-align: center; 
-            font-size: 0.9rem; 
-            color: #7f8c8d; 
-            margin-top: 20px; 
+        /* ADATTAMENTO PER CELLULARI (MOBILE) */
+        @media (max-width: 768px) {
+            .dashboard { flex-direction: column; }
+            .column { width: 100%; }
+            .header-actions { flex-direction: column; gap: 10px; }
+            .download-btn { width: 100%; }
         }
-
-        /* Scrollbar personalizzata per pulizia visiva */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>🚀 Dashboard Riunioni ASSP / Vai Oltre</h1>
+    <h1>🚀 Dashboard ASSP / Vai Oltre</h1>
+    
+    <div class="header-actions">
+        <button class="download-btn" onclick="downloadTeamVersion()">📥 Salva file per il Team</button>
+    </div>
     
     <div class="dashboard">
         <div class="column col-notes">
             <h2>📝 Appunti Riunione</h2>
             <div class="input-area">
                 <textarea id="input-notes" placeholder="Scrivi un appunto..."></textarea>
-                <button class="add-btn" onclick="addItem('notes')">Aggiungi Appunto</button>
+                <button class="add-btn" onclick="addItem('notes')">Aggiungi</button>
             </div>
             <div class="cards-container" id="container-notes"></div>
         </div>
@@ -165,7 +166,7 @@
         <div class="column col-short">
             <h2>⚡ To-Do Short Term</h2>
             <div class="input-area">
-                <textarea id="input-short" placeholder="Es. Erica: locandina entro venerdì..."></textarea>
+                <textarea id="input-short" placeholder="Es. Locandina entro venerdì..."></textarea>
                 <button class="add-btn" onclick="addItem('short')">Aggiungi Task</button>
             </div>
             <div class="cards-container" id="container-short"></div>
@@ -180,70 +181,61 @@
             <div class="cards-container" id="container-long"></div>
         </div>
     </div>
-    
-    <div class="status">✨ I dati vengono salvati in automatico come schede! ✨</div>
 
     <script>
-        // Struttura dati iniziale
-        let boardData = JSON.parse(localStorage.getItem('assp_board_v2')) || {
+        // --- CORE DEI DATI INCORPORATI ---
+        // Quando salvi il file, i dati vengono scritti qui dentro automaticamente
+        const fileData = /*DATA_START*/null/*DATA_END*/;
+        
+        let boardData = fileData || {
             notes: [],
             short: [],
             long: []
         };
 
-        // Funzione di salvataggio e aggiornamento visivo
-        function saveAndRender() {
-            localStorage.setItem('assp_board_v2', JSON.stringify(boardData));
-            renderBoard();
-        }
-
-        // Funzione per aggiungere un nuovo elemento
+        // Aggiunge un elemento
         function addItem(type) {
             const inputEl = document.getElementById(`input-${type}`);
             const text = inputEl.value.trim();
-            
             if (text) {
-                // Se è un appunto salva solo il testo, se è un todo aggiunge anche lo stato (fatto/non fatto)
                 if (type === 'notes') {
                     boardData[type].unshift({ text: text });
                 } else {
                     boardData[type].unshift({ text: text, done: false });
                 }
-                inputEl.value = ''; // Pulisce l'input
-                saveAndRender();
+                inputEl.value = '';
+                renderBoard();
             }
         }
 
-        // Funzione per eliminare una scheda
+        // Elimina un elemento
         function deleteItem(type, index) {
             boardData[type].splice(index, 1);
-            saveAndRender();
+            renderBoard();
         }
 
-        // Funzione per spuntare una checklist
+        // Spunta la checklist
         function toggleTodo(type, index) {
             boardData[type][index].done = !boardData[type][index].done;
-            saveAndRender();
+            renderBoard();
         }
 
-        // Genera visivamente le schede
+        // Crea le schede HTML
         function renderBoard() {
             ['notes', 'short', 'long'].forEach(type => {
                 const container = document.getElementById(`container-${type}`);
-                container.innerHTML = ''; // Svuota il contenitore prima di riempirlo
+                container.innerHTML = ''; 
 
                 boardData[type].forEach((item, index) => {
                     const card = document.createElement('div');
                     card.className = 'card';
 
                     if (type === 'notes') {
-                        // Rendering per Appunti (testo normale)
                         card.innerHTML = `
                             <div class="card-content">${item.text}</div>
                             <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">🗑️</button>
                         `;
                     } else {
-                        // Rendering per To-Do (con checkbox)
                         card.innerHTML = `
                             <div class="card-content todo-item">
                                 <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodo('${type}', ${index})">
@@ -257,7 +249,41 @@
             });
         }
 
-        // Permetti di aggiungere premendo "Maiusc + Invio" senza cliccare il bottone
+        // --- LA MAGIA DEL SALVATAGGIO ---
+        function downloadTeamVersion() {
+            // Svuota i contenitori visivi temporaneamente per non sporcare il codice da salvare
+            document.getElementById('container-notes').innerHTML = '';
+            document.getElementById('container-short').innerHTML = '';
+            document.getElementById('container-long').innerHTML = '';
+
+            // Trasforma i dati in testo
+            const dataString = JSON.stringify(boardData);
+
+            // Prende tutto il codice sorgente della pagina
+            let htmlContent = document.documentElement.outerHTML;
+
+            // Inserisce i dati freschi nel codice sorgente rimpiazzando la stringa /*DATA_START*/.../*DATA_END*/
+            htmlContent = htmlContent.replace(/\/\*DATA_START\*\/[\s\S]*?\/\*DATA_END\*\//, `/*DATA_START*/${dataString}/*DATA_END*/`);
+
+            // Crea il nuovo file e lancia il download
+            const blob = new Blob(['<!DOCTYPE html>\\n<html lang="it">\\n' + htmlContent + '\\n</html>'], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Crea un nome file con la data di oggi
+            const date = new Date();
+            const dateString = \`\${date.getFullYear()}-\${String(date.getMonth()+1).padStart(2,'0')}-\${String(date.getDate()).padStart(2,'0')}\`;
+            a.download = \`ASSP-Appunti-\${dateString}.html\`;
+            
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // Ridisegna la bacheca sullo schermo
+            renderBoard();
+        }
+
+        // Invio rapido con tastiera (Maiusc + Invio)
         ['notes', 'short', 'long'].forEach(type => {
             document.getElementById(`input-${type}`).addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && e.shiftKey) {
@@ -267,7 +293,7 @@
             });
         });
 
-        // Primo rendering all'apertura
+        // Primo avvio
         renderBoard();
     </script>
 </body>
