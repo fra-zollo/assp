@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Riunioni ASSP</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #2c3e50; 
+            margin-bottom: 30px;
+        }
+        .dashboard { 
+            display: flex; 
+            gap: 20px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        .column { 
+            flex: 1; 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            display: flex; 
+            flex-direction: column; 
+        }
+        h2 { 
+            font-size: 1.2rem; 
+            margin-top: 0; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 10px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Colori diversi per le 3 linee dei titoli */
+        .col-notes h2 { border-color: #3498db; } /* Blu */
+        .col-short h2 { border-color: #e74c3c; } /* Rosso */
+        .col-long h2 { border-color: #2ecc71; }  /* Verde */
+
+        textarea { 
+            flex-grow: 1; 
+            min-height: 500px; 
+            width: 100%; 
+            border: 1px solid #eee; 
+            background-color: #fafafa;
+            border-radius: 4px; 
+            padding: 15px; 
+            font-family: inherit; 
+            font-size: 14px; 
+            line-height: 1.5;
+            resize: vertical; 
+            box-sizing: border-box; 
+        }
+        textarea:focus { 
+            outline: none; 
+            border-color: #bdc3c7; 
+            background-color: #fff;
+        }
+        .status { 
+            text-align: center; 
+            font-size: 0.9rem; 
+            color: #7f8c8d; 
+            margin-top: 30px; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Dashboard Riunioni ASSP / Vai Oltre</h1>
+    
+    <div class="dashboard">
+        <div class="column col-notes">
+            <h2>📝 Appunti Riunione</h2>
+            <textarea id="notes" placeholder="Scrivi qui gli appunti della riunione in corso..."></textarea>
+        </div>
+        
+        <div class="column col-short">
+            <h2>⚡ To-Do Short Term</h2>
+            <textarea id="shortTerm" placeholder="- Erica: locandina entro venerdì&#10;- Michele: sentire manager..."></textarea>
+        </div>
+        
+        <div class="column col-long">
+            <h2>🎯 To-Do Long Term</h2>
+            <textarea id="longTerm" placeholder="- Preparare bando Fondazione CRV&#10;- Contattare foodtruck per agosto..."></textarea>
+        </div>
+    </div>
+    
+    <div class="status">✨ Nessun tasto "Salva" necessario: tutto quello che scrivi viene salvato in automatico nel tuo browser! ✨</div>
+
+    <script>
+        // Seleziona i 3 campi di testo
+        const notes = document.getElementById('notes');
+        const shortTerm = document.getElementById('shortTerm');
+        const longTerm = document.getElementById('longTerm');
+
+        // Carica i dati salvati quando apri il file
+        notes.value = localStorage.getItem('assp_notes') || '';
+        shortTerm.value = localStorage.getItem('assp_short') || '';
+        longTerm.value = localStorage.getItem('assp_long') || '';
+
+        // Funzione per salvare i dati ogni volta che premi un tasto
+        function saveData() {
+            localStorage.setItem('assp_notes', notes.value);
+            localStorage.setItem('assp_short', shortTerm.value);
+            localStorage.setItem('assp_long', longTerm.value);
+        }
+
+        // Ascolta gli eventi di scrittura (input) e attiva il salvataggio
+        notes.addEventListener('input', saveData);
+        shortTerm.addEventListener('input', saveData);
+        longTerm.addEventListener('input', saveData);
+    </script>
+</body>
+</html>
