@@ -22,56 +22,130 @@
             gap: 20px; 
             max-width: 1400px; 
             margin: 0 auto; 
+            align-items: flex-start;
         }
         .column { 
             flex: 1; 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            background: #eef2f5; 
+            padding: 15px; 
+            border-radius: 10px; 
             display: flex; 
             flex-direction: column; 
+            gap: 15px;
+            max-height: 85vh;
         }
         h2 { 
             font-size: 1.2rem; 
-            margin-top: 0; 
+            margin: 0; 
             border-bottom: 3px solid #3498db; 
             padding-bottom: 10px; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: #2c3e50;
         }
-        /* Colori diversi per le 3 linee dei titoli */
-        .col-notes h2 { border-color: #3498db; } /* Blu */
-        .col-short h2 { border-color: #e74c3c; } /* Rosso */
-        .col-long h2 { border-color: #2ecc71; }  /* Verde */
+        .col-notes h2 { border-color: #3498db; }
+        .col-short h2 { border-color: #e74c3c; }
+        .col-long h2 { border-color: #2ecc71; }
 
+        /* Area inserimento nuovi dati */
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
         textarea { 
-            flex-grow: 1; 
-            min-height: 500px; 
             width: 100%; 
-            border: 1px solid #eee; 
-            background-color: #fafafa;
-            border-radius: 4px; 
-            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            padding: 10px; 
             font-family: inherit; 
             font-size: 14px; 
-            line-height: 1.5;
             resize: vertical; 
             box-sizing: border-box; 
+            min-height: 60px;
         }
-        textarea:focus { 
-            outline: none; 
-            border-color: #bdc3c7; 
-            background-color: #fff;
+        button.add-btn {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
         }
+        button.add-btn:hover { background-color: #1a252f; }
+
+        /* Area delle schede scorrevole */
+        .cards-container {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 5px;
+        }
+        
+        /* Stile delle singole schede */
+        .card { 
+            background: #fff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            word-break: break-word;
+        }
+        .card-content {
+            flex-grow: 1;
+            white-space: pre-wrap; /* Mantiene gli "a capo" */
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        /* Stile specifico per le checklist */
+        .todo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .todo-item input[type="checkbox"] {
+            margin-top: 4px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #95a5a6;
+        }
+
+        /* Pulsante elimina */
+        button.delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 5px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .card:hover button.delete-btn { opacity: 1; }
+
         .status { 
             text-align: center; 
             font-size: 0.9rem; 
             color: #7f8c8d; 
-            margin-top: 30px; 
-            font-weight: bold;
+            margin-top: 20px; 
         }
+
+        /* Scrollbar personalizzata per pulizia visiva */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -81,44 +155,120 @@
     <div class="dashboard">
         <div class="column col-notes">
             <h2>📝 Appunti Riunione</h2>
-            <textarea id="notes" placeholder="Scrivi qui gli appunti della riunione in corso..."></textarea>
+            <div class="input-area">
+                <textarea id="input-notes" placeholder="Scrivi un appunto..."></textarea>
+                <button class="add-btn" onclick="addItem('notes')">Aggiungi Appunto</button>
+            </div>
+            <div class="cards-container" id="container-notes"></div>
         </div>
         
         <div class="column col-short">
             <h2>⚡ To-Do Short Term</h2>
-            <textarea id="shortTerm" placeholder="- Erica: locandina entro venerdì&#10;- Michele: sentire manager..."></textarea>
+            <div class="input-area">
+                <textarea id="input-short" placeholder="Es. Erica: locandina entro venerdì..."></textarea>
+                <button class="add-btn" onclick="addItem('short')">Aggiungi Task</button>
+            </div>
+            <div class="cards-container" id="container-short"></div>
         </div>
         
         <div class="column col-long">
             <h2>🎯 To-Do Long Term</h2>
-            <textarea id="longTerm" placeholder="- Preparare bando Fondazione CRV&#10;- Contattare foodtruck per agosto..."></textarea>
+            <div class="input-area">
+                <textarea id="input-long" placeholder="Es. Contattare foodtruck per agosto..."></textarea>
+                <button class="add-btn" onclick="addItem('long')">Aggiungi Task</button>
+            </div>
+            <div class="cards-container" id="container-long"></div>
         </div>
     </div>
     
-    <div class="status">✨ Nessun tasto "Salva" necessario: tutto quello che scrivi viene salvato in automatico nel tuo browser! ✨</div>
+    <div class="status">✨ I dati vengono salvati in automatico come schede! ✨</div>
 
     <script>
-        // Seleziona i 3 campi di testo
-        const notes = document.getElementById('notes');
-        const shortTerm = document.getElementById('shortTerm');
-        const longTerm = document.getElementById('longTerm');
+        // Struttura dati iniziale
+        let boardData = JSON.parse(localStorage.getItem('assp_board_v2')) || {
+            notes: [],
+            short: [],
+            long: []
+        };
 
-        // Carica i dati salvati quando apri il file
-        notes.value = localStorage.getItem('assp_notes') || '';
-        shortTerm.value = localStorage.getItem('assp_short') || '';
-        longTerm.value = localStorage.getItem('assp_long') || '';
-
-        // Funzione per salvare i dati ogni volta che premi un tasto
-        function saveData() {
-            localStorage.setItem('assp_notes', notes.value);
-            localStorage.setItem('assp_short', shortTerm.value);
-            localStorage.setItem('assp_long', longTerm.value);
+        // Funzione di salvataggio e aggiornamento visivo
+        function saveAndRender() {
+            localStorage.setItem('assp_board_v2', JSON.stringify(boardData));
+            renderBoard();
         }
 
-        // Ascolta gli eventi di scrittura (input) e attiva il salvataggio
-        notes.addEventListener('input', saveData);
-        shortTerm.addEventListener('input', saveData);
-        longTerm.addEventListener('input', saveData);
+        // Funzione per aggiungere un nuovo elemento
+        function addItem(type) {
+            const inputEl = document.getElementById(`input-${type}`);
+            const text = inputEl.value.trim();
+            
+            if (text) {
+                // Se è un appunto salva solo il testo, se è un todo aggiunge anche lo stato (fatto/non fatto)
+                if (type === 'notes') {
+                    boardData[type].unshift({ text: text });
+                } else {
+                    boardData[type].unshift({ text: text, done: false });
+                }
+                inputEl.value = ''; // Pulisce l'input
+                saveAndRender();
+            }
+        }
+
+        // Funzione per eliminare una scheda
+        function deleteItem(type, index) {
+            boardData[type].splice(index, 1);
+            saveAndRender();
+        }
+
+        // Funzione per spuntare una checklist
+        function toggleTodo(type, index) {
+            boardData[type][index].done = !boardData[type][index].done;
+            saveAndRender();
+        }
+
+        // Genera visivamente le schede
+        function renderBoard() {
+            ['notes', 'short', 'long'].forEach(type => {
+                const container = document.getElementById(`container-${type}`);
+                container.innerHTML = ''; // Svuota il contenitore prima di riempirlo
+
+                boardData[type].forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    if (type === 'notes') {
+                        // Rendering per Appunti (testo normale)
+                        card.innerHTML = `
+                            <div class="card-content">${item.text}</div>
+                            <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">🗑️</button>
+                        `;
+                    } else {
+                        // Rendering per To-Do (con checkbox)
+                        card.innerHTML = `
+                            <div class="card-content todo-item">
+                                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodo('${type}', ${index})">
+                                <span class="${item.done ? 'completed' : ''}">${item.text}</span>
+                            </div>
+                            <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">🗑️</button>
+                        `;
+                    }
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // Permetti di aggiungere premendo "Maiusc + Invio" senza cliccare il bottone
+        ['notes', 'short', 'long'].forEach(type => {
+            document.getElementById(`input-${type}`).addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.shiftKey) {
+                    e.preventDefault();
+                    addItem(type);
+                }
+            });
+        });
+
+        // Primo rendering all'apertura
+        renderBoard();
     </script>
 </body>
 </html>
