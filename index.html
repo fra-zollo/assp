@@ -5,177 +5,238 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard ASSP Condivisa</title>
     <style>
+        /* Design System in stile Apple */
+        :root {
+            --bg-color: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --text-main: #1D1D1F;
+            --text-secondary: #86868B;
+            --accent-blue: #0071E3;
+            --accent-red: #FF3B30;
+            --accent-green: #34C759;
+            --border-light: #E5E5EA;
+        }
+
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f4f7f6; 
-            color: #333; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
             margin: 0; 
-            padding: 20px; 
+            padding: 30px 20px; 
             box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
         }
         h1 { 
             text-align: center; 
-            color: #2c3e50; 
-            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+            margin-bottom: 25px;
         }
         .header-actions {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         .download-btn {
-            background-color: #8e44ad;
-            color: white;
+            background-color: rgba(0, 113, 227, 0.1);
+            color: var(--accent-blue);
             border: none;
-            padding: 12px 24px;
-            font-size: 1.1rem;
-            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 15px;
+            border-radius: 20px;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: background 0.2s, transform 0.1s;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
-        .download-btn:hover { background-color: #732d91; }
-        .download-btn:active { transform: scale(0.98); }
+        .download-btn:hover { 
+            background-color: var(--accent-blue); 
+            color: white;
+        }
+        .download-btn:active { transform: scale(0.97); }
 
         .dashboard { 
             display: flex; 
-            gap: 20px; 
-            max-width: 1400px; 
+            gap: 24px; 
+            max-width: 1200px; 
             margin: 0 auto; 
             align-items: flex-start;
         }
         .column { 
             flex: 1; 
-            background: #eef2f5; 
-            padding: 15px; 
-            border-radius: 10px; 
             display: flex; 
             flex-direction: column; 
-            gap: 15px;
+            gap: 16px;
             box-sizing: border-box;
         }
-        h2 { 
-            font-size: 1.2rem; 
-            margin: 0; 
-            border-bottom: 3px solid #3498db; 
-            padding-bottom: 10px; 
-            color: #2c3e50;
+        .col-header { 
+            font-size: 17px; 
+            font-weight: 600; 
+            margin: 0 0 4px 8px; 
+            letter-spacing: -0.3px;
         }
-        .col-notes h2 { border-color: #3498db; }
-        .col-short h2 { border-color: #e74c3c; }
-        .col-long h2 { border-color: #2ecc71; }
+        .col-notes .col-header { color: var(--accent-blue); }
+        .col-short .col-header { color: var(--accent-red); }
+        .col-long .col-header { color: var(--accent-green); }
 
         .input-area {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 18px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
         }
         textarea { 
             width: 100%; 
-            border: 1px solid #ddd; 
-            border-radius: 6px; 
-            padding: 10px; 
+            border: 1px solid var(--border-light); 
+            border-radius: 12px; 
+            padding: 12px; 
             font-family: inherit; 
-            font-size: 14px; 
+            font-size: 15px; 
+            background-color: #FAFAFC;
             resize: vertical; 
             box-sizing: border-box; 
-            min-height: 60px;
+            min-height: 70px;
+            transition: all 0.2s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background-color: var(--card-bg);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
         }
         button.add-btn {
-            background-color: #2c3e50;
+            background-color: var(--text-main);
             color: white;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
         }
-        button.add-btn:hover { background-color: #1a252f; }
+        button.add-btn:hover { background-color: #434345; }
 
         .cards-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         
         .card { 
-            background: #fff; 
-            padding: 15px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
+            background: var(--card-bg); 
+            padding: 16px; 
+            border-radius: 16px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.02);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
             word-break: break-word;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+            transform: translateY(-1px);
+        }
+
         .card-content {
             flex-grow: 1;
             white-space: pre-wrap; 
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.4;
+            color: var(--text-main);
         }
         
-        .todo-item { display: flex; align-items: flex-start; gap: 10px; }
-        .todo-item input[type="checkbox"] { margin-top: 4px; transform: scale(1.2); cursor: pointer; }
-        .completed { text-decoration: line-through; color: #95a5a6; }
+        /* Custom iOS-style Checkbox */
+        .todo-item { display: flex; align-items: flex-start; gap: 12px; }
+        .todo-item input[type="checkbox"] { 
+            appearance: none;
+            background-color: #fff;
+            margin: 2px 0 0 0;
+            font-size: inherit;
+            color: currentColor;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid #C7C7CC;
+            border-radius: 50%;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .todo-item input[type="checkbox"]::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--accent-blue);
+        }
+        .todo-item input[type="checkbox"]:checked {
+            border-color: var(--accent-blue);
+        }
+        .todo-item input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+        .completed { color: var(--text-secondary); text-decoration: line-through; }
 
         button.delete-btn {
             background: none;
             border: none;
-            color: #e74c3c;
+            color: var(--accent-red);
             cursor: pointer;
             font-size: 16px;
-            padding: 0 5px;
-            opacity: 0.5;
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 50%;
         }
-        .card:hover button.delete-btn { opacity: 1; }
+        .card:hover button.delete-btn { opacity: 0.6; }
+        button.delete-btn:hover { opacity: 1 !important; background-color: rgba(255, 59, 48, 0.1); }
 
-        /* ADATTAMENTO PER CELLULARI (MOBILE) */
-        @media (max-width: 768px) {
+        @media (max-width: 800px) {
             .dashboard { flex-direction: column; }
             .column { width: 100%; }
-            .header-actions { flex-direction: column; gap: 10px; }
-            .download-btn { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <h1>🚀 Dashboard ASSP / Vai Oltre</h1>
+    <h1>Dashboard ASSP</h1>
     
     <div class="header-actions">
-        <button class="download-btn" onclick="downloadTeamVersion()">📥 Salva file per il Team</button>
+        <button class="download-btn" onclick="downloadTeamVersion()">📥 Salva per il Team</button>
     </div>
     
     <div class="dashboard">
         <div class="column col-notes">
-            <h2>📝 Appunti Riunione</h2>
+            <h2 class="col-header">Appunti Riunione</h2>
             <div class="input-area">
-                <textarea id="input-notes" placeholder="Scrivi un appunto..."></textarea>
+                <textarea id="input-notes" placeholder="Cosa bolle in pentola?"></textarea>
                 <button class="add-btn" onclick="addItem('notes')">Aggiungi</button>
             </div>
             <div class="cards-container" id="container-notes"></div>
         </div>
         
         <div class="column col-short">
-            <h2>⚡ To-Do Short Term</h2>
+            <h2 class="col-header">To-Do Short Term</h2>
             <div class="input-area">
-                <textarea id="input-short" placeholder="Es. Locandina entro venerdì..."></textarea>
+                <textarea id="input-short" placeholder="Cosa facciamo questa settimana?"></textarea>
                 <button class="add-btn" onclick="addItem('short')">Aggiungi Task</button>
             </div>
             <div class="cards-container" id="container-short"></div>
         </div>
         
         <div class="column col-long">
-            <h2>🎯 To-Do Long Term</h2>
+            <h2 class="col-header">To-Do Long Term</h2>
             <div class="input-area">
-                <textarea id="input-long" placeholder="Es. Contattare foodtruck per agosto..."></textarea>
+                <textarea id="input-long" placeholder="Obiettivi a lungo termine..."></textarea>
                 <button class="add-btn" onclick="addItem('long')">Aggiungi Task</button>
             </div>
             <div class="cards-container" id="container-long"></div>
@@ -183,8 +244,7 @@
     </div>
 
     <script>
-        // --- CORE DEI DATI INCORPORATI ---
-        // Quando salvi il file, i dati vengono scritti qui dentro automaticamente
+        // Questa stringa verrà sostituita dinamicamente quando salvi il file
         const fileData = /*DATA_START*/null/*DATA_END*/;
         
         let boardData = fileData || {
@@ -193,7 +253,6 @@
             long: []
         };
 
-        // Aggiunge un elemento
         function addItem(type) {
             const inputEl = document.getElementById(`input-${type}`);
             const text = inputEl.value.trim();
@@ -208,19 +267,16 @@
             }
         }
 
-        // Elimina un elemento
         function deleteItem(type, index) {
             boardData[type].splice(index, 1);
             renderBoard();
         }
 
-        // Spunta la checklist
         function toggleTodo(type, index) {
             boardData[type][index].done = !boardData[type][index].done;
             renderBoard();
         }
 
-        // Crea le schede HTML
         function renderBoard() {
             ['notes', 'short', 'long'].forEach(type => {
                 const container = document.getElementById(`container-${type}`);
@@ -233,7 +289,7 @@
                     if (type === 'notes') {
                         card.innerHTML = `
                             <div class="card-content">${item.text}</div>
-                            <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">🗑️</button>
+                            <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">✕</button>
                         `;
                     } else {
                         card.innerHTML = `
@@ -241,7 +297,7 @@
                                 <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodo('${type}', ${index})">
                                 <span class="${item.done ? 'completed' : ''}">${item.text}</span>
                             </div>
-                            <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">🗑️</button>
+                            <button class="delete-btn" title="Elimina" onclick="deleteItem('${type}', ${index})">✕</button>
                         `;
                     }
                     container.appendChild(card);
@@ -249,41 +305,37 @@
             });
         }
 
-        // --- LA MAGIA DEL SALVATAGGIO ---
         function downloadTeamVersion() {
-            // Svuota i contenitori visivi temporaneamente per non sporcare il codice da salvare
+            // Svuota temporaneamente la visualizzazione per non "sporcare" il codice sorgente
             document.getElementById('container-notes').innerHTML = '';
             document.getElementById('container-short').innerHTML = '';
             document.getElementById('container-long').innerHTML = '';
 
-            // Trasforma i dati in testo
             const dataString = JSON.stringify(boardData);
-
-            // Prende tutto il codice sorgente della pagina
             let htmlContent = document.documentElement.outerHTML;
-
-            // Inserisce i dati freschi nel codice sorgente rimpiazzando la stringa /*DATA_START*/.../*DATA_END*/
+            
+            // Inietta i dati nel codice sorgente
             htmlContent = htmlContent.replace(/\/\*DATA_START\*\/[\s\S]*?\/\*DATA_END\*\//, `/*DATA_START*/${dataString}/*DATA_END*/`);
 
-            // Crea il nuovo file e lancia il download
+            // Crea il file da scaricare
             const blob = new Blob(['<!DOCTYPE html>\\n<html lang="it">\\n' + htmlContent + '\\n</html>'], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             
-            // Crea un nome file con la data di oggi
+            // Nome del file con la data del giorno
             const date = new Date();
             const dateString = \`\${date.getFullYear()}-\${String(date.getMonth()+1).padStart(2,'0')}-\${String(date.getDate()).padStart(2,'0')}\`;
             a.download = \`ASSP-Appunti-\${dateString}.html\`;
             
             a.click();
             URL.revokeObjectURL(url);
-
-            // Ridisegna la bacheca sullo schermo
+            
+            // Ricrea la visualizzazione
             renderBoard();
         }
 
-        // Invio rapido con tastiera (Maiusc + Invio)
+        // Permette di inviare i messaggi usando Shift + Invio
         ['notes', 'short', 'long'].forEach(type => {
             document.getElementById(`input-${type}`).addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && e.shiftKey) {
@@ -293,7 +345,7 @@
             });
         });
 
-        // Primo avvio
+        // Primo rendering
         renderBoard();
     </script>
 </body>
