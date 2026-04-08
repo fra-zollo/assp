@@ -318,15 +318,15 @@
             htmlContent = htmlContent.replace(/\/\*DATA_START\*\/[\s\S]*?\/\*DATA_END\*\//, `/*DATA_START*/${dataString}/*DATA_END*/`);
 
             // Crea il file da scaricare
-            const blob = new Blob(['<!DOCTYPE html>\\n<html lang="it">\\n' + htmlContent + '\\n</html>'], {type: 'text/html'});
+            const blob = new Blob(['<!DOCTYPE html>\n<html lang="it">\n' + htmlContent + '\n</html>'], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             
             // Nome del file con la data del giorno
             const date = new Date();
-            const dateString = \`\${date.getFullYear()}-\${String(date.getMonth()+1).padStart(2,'0')}-\${String(date.getDate()).padStart(2,'0')}\`;
-            a.download = \`ASSP-Appunti-\${dateString}.html\`;
+            const dateString = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+            a.download = `ASSP-Appunti-${dateString}.html`;
             
             a.click();
             URL.revokeObjectURL(url);
