@@ -244,14 +244,27 @@
     </div>
 
     <script>
-        // Questa stringa verrà sostituita dinamicamente quando salvi il file
         const fileData = /*DATA_START*/null/*DATA_END*/;
+        let hasUnsavedChanges = false;
         
-        let boardData = fileData || {
-            notes: [],
-            short: [],
-            long: []
-        };
+        // 1. MEMORIA ANTI-REFRESH: Controlla se c'è una bozza salvata nella sessione corrente
+        const sessionDraft = sessionStorage.getItem('assp_draft');
+        
+        let boardData;
+        if (sessionDraft) {
+            boardData = JSON.parse(sessionDraft); // Ripristina dopo il refresh
+        } else if (fileData) {
+            boardData = fileData; // Carica i dati dal file scaricato
+        } else {
+            boardData = { notes: [], short: [], long: [] }; // File completamente vuoto
+        }
+
+        // Funzione centrale che aggiorna lo schermo e salva la bozza invisibile
+        function updateState() {
+            sessionStorage.setItem('assp_draft', JSON.stringify(boardData));
+            hasUnsavedChanges = true;
+            renderBoard();
+        }
 
         function addItem(type) {
             const inputEl = document.getElementById(`input-${type}`);
@@ -263,18 +276,18 @@
                     boardData[type].unshift({ text: text, done: false });
                 }
                 inputEl.value = '';
-                renderBoard();
+                updateState();
             }
         }
 
         function deleteItem(type, index) {
             boardData[type].splice(index, 1);
-            renderBoard();
+            updateState();
         }
 
         function toggleTodo(type, index) {
             boardData[type][index].done = !boardData[type][index].done;
-            renderBoard();
+            updateState();
         }
 
         function renderBoard() {
@@ -306,7 +319,7 @@
         }
 
         function downloadTeamVersion() {
-            // Svuota temporaneamente la visualizzazione per non "sporcare" il codice sorgente
+            // Svuota temporaneamente la visualizzazione
             document.getElementById('container-notes').innerHTML = '';
             document.getElementById('container-short').innerHTML = '';
             document.getElementById('container-long').innerHTML = '';
@@ -317,13 +330,12 @@
             // Inietta i dati nel codice sorgente
             htmlContent = htmlContent.replace(/\/\*DATA_START\*\/[\s\S]*?\/\*DATA_END\*\//, `/*DATA_START*/${dataString}/*DATA_END*/`);
 
-            // Crea il file da scaricare
+            // Crea il file
             const blob = new Blob(['<!DOCTYPE html>\n<html lang="it">\n' + htmlContent + '\n</html>'], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             
-            // Nome del file con la data del giorno
             const date = new Date();
             const dateString = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
             a.download = `ASSP-Appunti-${dateString}.html`;
@@ -331,11 +343,23 @@
             a.click();
             URL.revokeObjectURL(url);
             
+            // 2. CANE DA GUARDIA: Ora che abbiamo salvato, abbassiamo l'allarme
+            hasUnsavedChanges = false;
+            sessionStorage.removeItem('assp_draft'); 
+            
             // Ricrea la visualizzazione
             renderBoard();
         }
 
-        // Permette di inviare i messaggi usando Shift + Invio
+        // Il "Cane da guardia" che avvisa se si tenta di chiudere senza salvare
+        window.addEventListener('beforeunload', function (e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'Hai delle modifiche non salvate! Sicuro di voler uscire?';
+            }
+        });
+
+        // Tasti rapidi
         ['notes', 'short', 'long'].forEach(type => {
             document.getElementById(`input-${type}`).addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && e.shiftKey) {
